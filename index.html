@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#08285b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Coutinho Logística">
+  <meta name="format-detection" content="telephone=no">
+  <title>Coutinho Logística iOS</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <style>
+    :root { font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color-scheme:light; }
+    * { box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
+    html,body { margin:0;width:100%;height:100%;background:#eef3f9;overflow:hidden; }
+    body { padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom); }
+    #shell { position:relative;width:100%;height:100dvh;background:#fff; }
+    #appFrame { width:100%;height:100%;border:0;display:block;background:#fff; }
+    #loading { position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:linear-gradient(180deg,#08285b,#0f4a91);transition:opacity .25s ease; }
+    #loading.hidden { opacity:0;pointer-events:none; }
+    .brand { color:#fff;text-align:center;padding:28px; }
+    .logo { width:84px;height:84px;margin:0 auto 16px;border-radius:24px;background:#fff;color:#08285b;display:grid;place-items:center;font-weight:900;font-size:30px;box-shadow:0 14px 34px rgba(0,0,0,.22); }
+    .brand h1 { font-size:23px;margin:0 0 7px; }
+    .brand p { margin:0;opacity:.86; }
+    #iosInstall { display:none;position:absolute;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;background:rgba(8,40,91,.97);color:#fff;border-radius:18px;padding:14px;box-shadow:0 12px 34px rgba(0,0,0,.24); }
+    #iosInstall.show { display:block; }
+    #iosInstall strong { display:block;margin-bottom:5px; }
+    #iosInstall small { opacity:.86;line-height:1.45; }
+    #iosInstall button { margin-top:10px;width:100%;border:0;border-radius:12px;background:#fff;color:#08285b;font-weight:800;padding:11px; }
+    #errorBox { display:none;position:absolute;inset:0;z-index:40;place-items:center;background:#eef3f9;padding:24px; }
+    #errorBox.show { display:grid; }
+    .card { max-width:460px;background:#fff;border-radius:22px;padding:24px;box-shadow:0 16px 42px rgba(13,39,80,.14);text-align:center; }
+    .card h2 { color:#08285b;margin-top:0; }
+    .card .primary,.card .secondary { width:100%;border-radius:14px;padding:13px;margin-top:8px;font-weight:800; }
+    .card .primary { border:0;background:#08285b;color:#fff; }
+    .card .secondary { border:1px solid #cfd9e5;background:#fff;color:#08285b; }
+  </style>
+</head>
+<body>
+  <main id="shell">
+    <div id="loading">
+      <div class="brand">
+        <div class="logo">CL</div>
+        <h1>Coutinho Logística</h1>
+        <p>Versão otimizada para iPhone e iPad</p>
+      </div>
+    </div>
+
+    <iframe id="appFrame" title="Coutinho Logística"
+      src="https://script.google.com/macros/s/AKfycbw9_GypoVyYQ6qArmPOTsVXTBR1h4AoRwwwwjR4JCu4Gu3cj9TRDFtgEQX7UTaDPM3C/exec"
+      allow="geolocation; camera; microphone; clipboard-read; clipboard-write"
+      referrerpolicy="strict-origin-when-cross-origin"></iframe>
+
+    <section id="iosInstall">
+      <strong>Instalar no iPhone/iPad</strong>
+      <small>No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”. Abra pelo novo ícone para usar em tela cheia.</small>
+      <button type="button" id="closeInstall">ENTENDI</button>
+    </section>
+
+    <div id="errorBox">
+      <div class="card">
+        <h2>Não foi possível abrir o sistema</h2>
+        <p>Verifique sua conexão e tente novamente. No iOS, prefira sempre o Safari.</p>
+        <button class="primary" type="button" onclick="location.reload()">TENTAR NOVAMENTE</button>
+        <button class="secondary" type="button" onclick="window.location.href='https://script.google.com/macros/s/AKfycbw9_GypoVyYQ6qArmPOTsVXTBR1h4AoRwwwwjR4JCu4Gu3cj9TRDFtgEQX7UTaDPM3C/exec'">ABRIR DIRETAMENTE</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const frame=document.getElementById('appFrame');
+    const loading=document.getElementById('loading');
+    const errorBox=document.getElementById('errorBox');
+    const iosInstall=document.getElementById('iosInstall');
+    const closeInstall=document.getElementById('closeInstall');
+    let loaded=false;
+
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+
+    const standalone=window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone===true;
+
+    frame.addEventListener('load',()=>{
+      loaded=true;
+      loading.classList.add('hidden');
+    });
+
+    setTimeout(()=>{
+      if(!loaded) errorBox.classList.add('show');
+    },25000);
+
+    if(isIOS && !standalone && sessionStorage.getItem('iosInstallDismissed')!=='1'){
+      setTimeout(()=>iosInstall.classList.add('show'),1800);
+    }
+
+    closeInstall.addEventListener('click',()=>{
+      sessionStorage.setItem('iosInstallDismissed','1');
+      iosInstall.classList.remove('show');
+    });
+
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+      });
+    }
+  </script>
+</body>
+</html>
